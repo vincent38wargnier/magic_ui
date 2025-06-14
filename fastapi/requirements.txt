@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+langchain
+langchain-core
+langgraph
+openai
+mongoengine
+python-multipart
+python-dotenv
+pymongo 
