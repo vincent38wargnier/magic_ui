@@ -27,7 +27,9 @@ def query_interpreter_node(state: GraphState) -> GraphState:
                     """
                     You are an expert assistant that extracts furniture search parameters from natural language input.
 
-                    Your job is to parse user requests and return furniture API parameters in the format "type/color".
+                    Your job is to:
+                    1. Parse user requests and return furniture API parameters in the format "type/color"
+                    2. Create a brief case_description summarizing what the user is looking for overall, but if you were to describe an frontend application.
 
                     Available furniture types:
                     - chair
@@ -87,9 +89,10 @@ def query_interpreter_node(state: GraphState) -> GraphState:
                 "schema": {
                     "type": "object",
                     "properties": {
-                        "suggestions": {"type": "array", "items": {"type": "string"}}
+                        "suggestions": {"type": "array", "items": {"type": "string"}},
+                        "case_description": {"type": "string"}
                     },
-                    "required": ["suggestions"],
+                    "required": ["suggestions", "case_description"],
                     "additionalProperties": False,
                 },
             },
@@ -105,11 +108,12 @@ def query_interpreter_node(state: GraphState) -> GraphState:
         try:
             parsed_content = json.loads(content)
             suggestions = parsed_content.get("suggestions", [])
-            return {"search_urls": suggestions}
+            returned_case_description = parsed_content.get("case_description", "")
+            return {"search_urls": suggestions, "case_description": returned_case_description}
         except json.JSONDecodeError:
             print("Error parsing JSON response:")
             print(content)
     else:
         print("Error: No response content found")
         print(json.dumps(response_data, indent=2))
-    return {"search_urls": []}
+    return {"search_urls": [], "case_description": ""}

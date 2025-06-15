@@ -14,7 +14,7 @@ from db.mongodb import connect_to_mongo
 from app.agents.ui_generator_agent.graph import run_ui_generator_agent
 from app.agents.default_agent_framework.graph import run_default_agent
 from app.agents.anthropic_no_lanngshit.agent import run_claude_ui_agent
-
+from app.agents.conversation_agent.agent.graph import run_conversation_agent
 
 class Furniture(BaseModel):
     id: int
@@ -273,6 +273,7 @@ async def conversation_agent(request: ChatRequest):
     )
     
     search_urls = result["search_urls"]
+    case_description = result["case_description"]
     print(f"Search URLs: {search_urls}")
     
     # Collect all furniture results via direct function calls
@@ -289,9 +290,11 @@ async def conversation_agent(request: ChatRequest):
                 print(f"No furniture found for {search_param}: {e.detail}")
             except Exception as e:
                 print(f"Error processing {search_param}: {e}")
+                
+    
     
     return {
-        "search_params": search_urls,
+        "case_description": case_description,
         "products": all_furniture,
         "conversation_id": result["conversation_id"]
     }

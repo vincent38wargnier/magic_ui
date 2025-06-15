@@ -71,8 +71,9 @@ async def run_conversation_agent(
 
         print("✅ Conversation agent workflow completed successfully")
         
-        # Extract search_urls from result
+        # Extract search_urls and case_description from result
         search_urls = result.get("search_urls", [])
+        case_description = result.get("case_description", "")
         
         # Create response text
         if search_urls:
@@ -88,7 +89,8 @@ async def run_conversation_agent(
         return {
             "response": final_response, 
             "conversation_id": conversation_id,
-            "search_urls": search_urls
+            "search_urls": search_urls,
+            "case_description": case_description
         }
 
     except Exception as e:
