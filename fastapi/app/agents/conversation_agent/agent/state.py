@@ -1,7 +1,7 @@
-from typing import List, TypedDict, Dict
+from typing import List, TypedDict, Dict, Any
 
 
 class GraphState(TypedDict):
     case_description: str
     messages: List[Dict[str, str]]
-    search_urls: List[str]
+    items: List[Dict[str, Any]]

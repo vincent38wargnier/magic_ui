@@ -71,15 +71,16 @@ async def run_conversation_agent(
 
         print("✅ Conversation agent workflow completed successfully")
         
-        # Extract search_urls and case_description from result
-        search_urls = result.get("search_urls", [])
+        # Extract items and case_description from result
+        items = result.get("items", [])
         case_description = result.get("case_description", "")
         
         # Create response text
-        if search_urls:
-            final_response = f"Found furniture suggestions: {', '.join(search_urls)}"
+        if items:
+            item_descriptions = [item.get('description', 'Item') for item in items]
+            final_response = f"Found {len(items)} items: {', '.join(item_descriptions[:2])}"
         else:
-            final_response = "No furniture suggestions found."
+            final_response = "No items found."
         
         # Store agent response in conversation using MongoDB
         print(f"💾 Storing agent response in conversation: {conversation_id}")
@@ -89,7 +90,7 @@ async def run_conversation_agent(
         return {
             "response": final_response, 
             "conversation_id": conversation_id,
-            "search_urls": search_urls,
+            "items": items,
             "case_description": case_description
         }
 

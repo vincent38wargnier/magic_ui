@@ -272,43 +272,35 @@ async def conversation_agent(request: ChatRequest):
         conversation_id=request.conversation_id,
     )
     
-    search_urls = result["search_urls"]
+    items = result["items"]  # Complete objects from agent
     case_description = result["case_description"]
-    print(f"Search URLs: {search_urls}")
+    print(f"✅ Agent returned {len(items)} items")
     
-    # Collect all furniture results via direct function calls
-    all_furniture = []
-    
-    for search_param in search_urls:
-        if "/" in search_param:
-            try:
-                furniture_type, color = search_param.split("/", 1)
-                furniture_result = await get_furniture(furniture_type, color)
-                all_furniture.extend(furniture_result)
-                print(f"Found {len(furniture_result)} items for {search_param}")
-            except HTTPException as e:
-                print(f"No furniture found for {search_param}: {e.detail}")
-            except Exception as e:
-                print(f"Error processing {search_param}: {e}")
-    
-    # Now call the chat agent to generate a frontend app for the found furniture
-    if all_furniture:
-        image_urls = [item['img_url'] for item in all_furniture]
-        print(f"Image URLs: {image_urls}")
-        product_descriptions = [item['description'] for item in all_furniture]
+    # Generate frontend app for the found items
+    if items:
+        image_urls = [item.get('img_url', item.get('image_url', '')) for item in items]
+        descriptions = [item['description'] for item in items]
+        
+        print(f"🎨 Generating UI with {len(items)} items")
+        print(f"🖼️ Image URLs: {image_urls[:2]}...")  # Show first 2
+        print(f"📝 Descriptions: {descriptions[:2]}...")  # Show first 2
         
         chat_message = f"""
         Create a frontend app for this case: {case_description}
         
-        Use these product images: {', '.join(image_urls[:2])}
+        Use these images: {', '.join(image_urls)}
         
-        Product descriptions: {', '.join(product_descriptions[:2])}
+        Item descriptions: {', '.join(descriptions)}
         
-        MAKE SURE EVERY VARIABLE AND FUNCTION IS DEFINED. Create a complete, working frontend application that helps the user compare and choose from these furniture options.
+        MAKE SURE EVERY VARIABLE AND FUNCTION IS DEFINED. Create a complete, working frontend application.
         """
         
-        # Call the default_agent to generate a smart response
+        print(f"📤 Sending message to UI generator (length: {len(chat_message)} chars)")
         result = await run_claude_ui_agent(chat_message)
+        print(f"📥 UI generator returned result (length: {len(str(result))} chars)")
+    else:
+        print("❌ No items found, skipping UI generation")
+        result = {"error": "No items found"}
     
     return {
         "ai_response": result
