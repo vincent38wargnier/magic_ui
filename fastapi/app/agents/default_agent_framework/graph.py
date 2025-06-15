@@ -5,32 +5,32 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 from fastapi import HTTPException
 
-from app.agents.ui_generator_agent.graphstate import GraphState
-from app.agents.ui_generator_agent.nodes.react_node import ui_generator_agent_node
-from app.agents.ui_generator_agent.conditionnal_edges.react_conditionnal import tools_condition
-from app.agents.ui_generator_agent.tools.tools_wrapper import tools_wrapper
+from app.agents.default_agent_framework.graphstate import GraphState
+from app.agents.default_agent_framework.nodes.default_node import default_agent_node
+from app.agents.default_agent_framework.conditionnal_edges.default_conditionnal import tools_condition
+from app.agents.default_agent_framework.tools.tools_wrapper import tools_wrapper
 from crud.conversation_crud import ConversationCRUD
 
-REACT_GENERATOR = "ui_generator"
+DEFAULT_AGENT = "default_agent"
 
 async def create_workflow():
-    """Create the UI generator workflow."""
-    print("Creating UI generator workflow")
+    """Create the default agent workflow."""
+    print("Creating default agent workflow")
     
     workflow = StateGraph(GraphState)
     
-    # Add UI generator node with async wrapper
-    async def ui_generator_wrapper(state: GraphState, config: RunnableConfig):
-        return await ui_generator_agent_node(state, config)
+    # Add default agent node with async wrapper
+    async def default_agent_wrapper(state: GraphState, config: RunnableConfig):
+        return await default_agent_node(state, config)
     
-    workflow.set_entry_point(REACT_GENERATOR)
+    workflow.set_entry_point(DEFAULT_AGENT)
 
-    workflow.add_node(REACT_GENERATOR, action=ui_generator_wrapper)
+    workflow.add_node(DEFAULT_AGENT, action=default_agent_wrapper)
     workflow.add_node("tools", action=ToolNode(tools_wrapper))
     
     # Add conditional edges for tools
     workflow.add_conditional_edges(
-        source=REACT_GENERATOR,
+        source=DEFAULT_AGENT,
         path=tools_condition,
         path_map={
             "continue": "tools",
@@ -39,21 +39,21 @@ async def create_workflow():
         }
     )
     
-    # Add edge from tools back to UI generator
-    workflow.add_edge("tools", REACT_GENERATOR)
+    # Add edge from tools back to default agent
+    workflow.add_edge("tools", DEFAULT_AGENT)
     
-    print("UI generator workflow created and compiled")
+    print("Default agent workflow created and compiled")
     return workflow.compile()
 
-async def run_ui_generator_agent(
+async def run_default_agent(
     message: str,
     user_id: str,
     user_timezone: str,
     agent_id: str,
     conversation_id: Optional[str] = None
 ):
-    """Run the UI generator workflow with a message."""
-    print(f"Starting UI generator for user {user_id}")
+    """Run the default agent workflow with a message."""
+    print(f"Starting default agent for user {user_id}")
     
     workflow = await create_workflow()
     
@@ -86,7 +86,7 @@ async def run_ui_generator_agent(
         "telegram_bot_token": "dummy"
     }
     
-    print("🚀 Running UI generator workflow")
+    print("🚀 Running default agent workflow")
     
     try:
         result = await workflow.ainvoke(
@@ -100,27 +100,15 @@ async def run_ui_generator_agent(
             )
         )
         
-        print("✅ UI generator workflow completed successfully")
+        print("✅ Default agent workflow completed successfully")
         
-        # Extract the final response from messages - handle tool results
+        # Extract the final response from messages
         final_messages = result.get("messages", [])
         if final_messages:
-            # Look for tool results or final agent response
-            final_response = "UI component generated successfully."
-            
-            # Check the last few messages for tool results
-            for message in reversed(final_messages[-3:]):  # Check last 3 messages
-                if hasattr(message, 'content'):
-                    # If it's a tool result with URL, use that
-                    if isinstance(message.content, str) and "View your component here" in message.content:
-                        final_response = message.content
-                        break
-                    # If it's a regular message, use that as fallback
-                    elif isinstance(message.content, str) and message.content.strip():
-                        final_response = message.content
-                        
+            last_message = final_messages[-1]
+            final_response = last_message.content if hasattr(last_message, 'content') else str(last_message)
         else:
-            final_response = "UI component generated successfully."
+            final_response = "Request processed successfully."
         
         # Store agent response in conversation using MongoDB
         print(f"💾 Storing agent response in conversation: {conversation_id}")
@@ -133,5 +121,5 @@ async def run_ui_generator_agent(
         }
         
     except Exception as e:
-        print(f"❌ Error in UI generator workflow: {e}")
-        raise HTTPException(status_code=500, detail=f"UI generator error: {str(e)}") 
+        print(f"❌ Error in default agent workflow: {e}")
+        raise HTTPException(status_code=500, detail=f"Default agent error: {str(e)}") 

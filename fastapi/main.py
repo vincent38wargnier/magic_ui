@@ -11,6 +11,7 @@ load_dotenv()
 # Initialize MongoDB connection
 from db.mongodb import connect_to_mongo
 from app.agents.ui_generator_agent.graph import run_ui_generator_agent
+from app.agents.default_agent_framework.graph import run_default_agent
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,12 +55,12 @@ async def test():
                 }
             },
             {
-                "description": "General Question",
+                "description": "General Question with Default Agent",
                 "method": "POST", 
                 "url": "/chat",
                 "body": {
                     "message": "who is the president of france",
-                    "agent": "ui_generator"
+                    "agent": "default_agent"
                 }
             },
             {
@@ -82,6 +83,15 @@ async def chat_with_agent(request: ChatRequest):
         # Route to different agents based on agent parameter
         if request.agent == "ui_generator":
             result = await run_ui_generator_agent(
+                message=request.message,
+                user_id=request.user_id,
+                user_timezone=request.user_timezone,
+                agent_id=request.agent,
+                conversation_id=request.conversation_id
+            )
+            return {"success": True, "result": result}
+        elif request.agent == "default_agent":
+            result = await run_default_agent(
                 message=request.message,
                 user_id=request.user_id,
                 user_timezone=request.user_timezone,
