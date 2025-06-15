@@ -12,6 +12,9 @@ class Settings:
     # OpenAI Configuration
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
+    # Telegram Configuration
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
+
     # Application Configuration
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
