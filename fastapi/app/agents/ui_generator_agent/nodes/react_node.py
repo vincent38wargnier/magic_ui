@@ -10,25 +10,28 @@ from ..tools.tools_wrapper import tools_wrapper
 model = ChatAnthropic(
     model="claude-3-5-sonnet-20241022",
     temperature=0.7,
-    api_key=os.getenv("ANTHROPIC_API_KEY")
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 
 model_with_tools = model.bind_tools(tools_wrapper)
 
-async def ui_generator_agent_node(state: GraphState, config: RunnableConfig) -> Dict[str, Any]:
+
+async def ui_generator_agent_node(
+    state: GraphState, config: RunnableConfig
+) -> Dict[str, Any]:
     """UI generator agent node that creates HTML/CSS/JS components using LangChain tools."""
-    
+
     print("🎨 UI Generator Agent Started")
-    
+
     # Get all messages for conversation context
     messages = state["messages"]
-    
+
     if not messages:
         print("❌ No messages found")
         return state
-    
+
     print(f"📝 Processing {len(messages)} messages in conversation")
-    
+
     # System prompt for UI generation
     system_prompt = """You are a specialized UI Component Generator that creates interactive web components for the mcpmyapi.com platform.
 
@@ -151,47 +154,55 @@ store_ui_component(content="<div class='min-h-screen bg-red-600 text-white p-8'>
 
     try:
         print("🔄 Building conversation with system instructions")
-        
+
         # Build conversation: system instructions plus prior messages
         conversation: list[BaseMessage] = [SystemMessage(content=system_prompt)]
         conversation.extend(messages)
-        
+
         print(f"🤖 Invoking model with {len(conversation)} messages (including system)")
-        print(f"🔧 Model configured with tools: {[tool.name for tool in tools_wrapper]}")
-        
+        print(
+            f"🔧 Model configured with tools: {[tool.name for tool in tools_wrapper]}"
+        )
+
         # Invoke model with tools
         response_msg = model_with_tools.invoke(conversation, config)
-        
+
         print("✅ Response generated")
         print(f"🔍 Response type: {type(response_msg)}")
-        print(f"🔍 Response content: {response_msg.content if hasattr(response_msg, 'content') else 'No content'}")
-        print(f"🔍 Response additional_kwargs: {response_msg.additional_kwargs if hasattr(response_msg, 'additional_kwargs') else 'No kwargs'}")
-        
+        print(
+            f"🔍 Response content: {response_msg.content if hasattr(response_msg, 'content') else 'No content'}"
+        )
+        print(
+            f"🔍 Response additional_kwargs: {response_msg.additional_kwargs if hasattr(response_msg, 'additional_kwargs') else 'No kwargs'}"
+        )
+
         # Log tool calls if any
-        if hasattr(response_msg, 'additional_kwargs') and response_msg.additional_kwargs.get('tool_calls'):
-            tool_calls = response_msg.additional_kwargs['tool_calls']
+        if hasattr(
+            response_msg, "additional_kwargs"
+        ) and response_msg.additional_kwargs.get("tool_calls"):
+            tool_calls = response_msg.additional_kwargs["tool_calls"]
             print(f"🛠️ Model requested {len(tool_calls)} tool calls")
             for idx, tool in enumerate(tool_calls, 1):
                 print(f"  Tool #{idx}: {tool['function']['name']}")
         else:
             print("💬 Model responded directly without tools")
-        
+
         # Update state
         updated_state = state.copy()
         updated_state["messages"] = messages + [response_msg]
         updated_state["recursion_count"] = state.get("recursion_count", 0) + 1
-        
+
         return updated_state
-        
+
     except Exception as e:
         print(f"❌ Error in UI generator: {e}")
-        
+
         error_message = AIMessage(
             content=f"I encountered an error while generating the UI component: {str(e)}"
         )
-        
+
         updated_state = state.copy()
         updated_state["messages"] = messages + [error_message]
         updated_state["recursion_count"] = state.get("recursion_count", 0) + 1
-        
-        return updated_state 
+
+        return updated_state
