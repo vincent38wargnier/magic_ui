@@ -267,7 +267,7 @@ Available Data:
         ]
         + messages,
         "temperature": 0,
-        "max_tokens": 500,
+        "max_tokens": 1000,
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -306,6 +306,25 @@ Available Data:
             print("Error parsing JSON response:")
             print(content)
             print(f"JSON Error: {e}")
+            
+            # Try to extract partial data if JSON is incomplete
+            if "suggestions" in content and "[" in content:
+                print("🔧 Attempting to recover partial data...")
+                try:
+                    # Find the suggestions array start
+                    start_idx = content.find('"suggestions": [')
+                    if start_idx != -1:
+                        # Extract just the suggestions part and try to fix it
+                        suggestions_part = content[start_idx:]
+                        print(f"🔧 Partial suggestions found: {suggestions_part[:200]}...")
+                        # For now, return empty - could implement more sophisticated recovery
+                except Exception as recovery_error:
+                    print(f"🔧 Recovery failed: {recovery_error}")
+            
+            # Return state with empty results on error
+            state["items"] = []
+            state["case_description"] = ""
+            return state
     else:
         print("Error: No response content found")
         print(json.dumps(response_data, indent=2))

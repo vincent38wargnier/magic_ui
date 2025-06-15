@@ -3,7 +3,7 @@ import json
 import asyncio
 import httpx
 from anthropic import Anthropic
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 class ClaudeUIAgent:
@@ -166,16 +166,23 @@ Return ONLY the complete HTML code with embedded CSS and JavaScript, no explanat
         except Exception as e:
             raise Exception(f"Failed to post to endpoint: {str(e)}")
     
-    async def process_request(self, user_message: str) -> Dict[str, Any]:
+    async def process_request(self, user_message: str, validation_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Main method to process user request and return URL"""
         try:
             # Step 1: Generate UI code
             ui_code = await self.generate_ui_code(user_message)
             
-            # Step 2: Post to endpoint
+            # Step 2: Validate and fix HTML if validation data provided
+            if validation_data:
+                print("🔍 Validating generated HTML...")
+                validator = HTMLValidator()
+                ui_code = await validator.validate_and_fix_html(ui_code, validation_data)
+                print("✅ HTML validation completed")
+            
+            # Step 3: Post to endpoint
             endpoint_response = await self.post_to_endpoint(ui_code)
             
-            # Step 3: Return the result
+            # Step 4: Return the result
             return {
                 "success": True,
                 "message": "UI generated and posted successfully!",
@@ -193,8 +200,88 @@ Return ONLY the complete HTML code with embedded CSS and JavaScript, no explanat
             }
 
 
+class HTMLValidator:
+    """Validates that generated HTML contains all required images and data"""
+    
+    def __init__(self):
+        self.client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.model = "claude-sonnet-4-20250514"
+    
+    async def validate_and_fix_html(self, html_code: str, required_data: Dict[str, Any]) -> str:
+        """Validate HTML and fix missing elements"""
+        
+        # Extract required elements
+        image_urls = required_data.get('image_urls', [])
+        descriptions = required_data.get('descriptions', [])
+        locations = required_data.get('locations', [])
+        
+        validation_prompt = f"""
+You are an HTML validator. Check if the provided HTML code contains ALL the required elements and has NO JavaScript errors.
+
+REQUIRED ELEMENTS TO CHECK:
+- Image URLs that MUST be in HTML: {image_urls}
+- Descriptions that MUST be visible: {descriptions}
+- Locations that MUST be shown: {locations}
+
+CRITICAL JAVASCRIPT VALIDATION:
+1. Check if ALL onclick functions are properly defined
+2. Look for onclick="functionName()" and ensure function functionName() exists
+3. Remove any undefined functions or fix missing function definitions
+4. NO complex filtering, sorting, or comparison features
+
+SIMPLE FUNCTIONALITY REQUIREMENTS:
+- For FURNITURE items: Only "Add to Cart" buttons (no filters, no comparison)
+- For EVENTS items: Only "Register" buttons (no filters, no sorting)
+- Each item should have: image, description, and ONE simple button
+- NO fancy features like clearSelections, filterByType, etc.
+
+HTML CODE TO VALIDATE:
+{html_code}
+
+TASK:
+1. Check if ALL image URLs are present as <img src="URL"> tags
+2. Check if ALL descriptions are visible as text content
+3. Check if ALL locations are displayed (if provided)
+4. CRITICAL: Check if all onclick functions are defined in JavaScript
+5. Remove or fix any undefined JavaScript functions
+6. Simplify to basic functionality only
+
+IF ANYTHING IS MISSING OR BROKEN:
+- Add missing <img> tags with exact URLs
+- Add missing descriptions as visible text
+- Add missing locations as visible text
+- Fix undefined JavaScript functions
+- Replace complex features with simple "Add to Cart" or "Register" buttons
+- Keep the existing structure and styling but make it SIMPLE
+
+Return the corrected HTML code with all required elements and working JavaScript.
+Return ONLY the complete HTML code, no explanations.
+"""
+
+        try:
+            message = self.client.messages.create(
+                model=self.model,
+                max_tokens=4000,
+                temperature=0.1,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": validation_prompt
+                    }
+                ]
+            )
+            
+            # Extract the text content from the response
+            validated_html = message.content[0].text if message.content else html_code
+            return validated_html.strip()
+            
+        except Exception as e:
+            print(f"❌ HTML validation failed: {str(e)}")
+            return html_code  # Return original if validation fails
+
+
 # Simple function to run the agent
-async def run_claude_ui_agent(user_message: str) -> Dict[str, Any]:
+async def run_claude_ui_agent(user_message: str, validation_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Simple function to run the Claude UI agent"""
     agent = ClaudeUIAgent()
-    return await agent.process_request(user_message) 
+    return await agent.process_request(user_message, validation_data) 

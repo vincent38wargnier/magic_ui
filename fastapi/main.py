@@ -285,19 +285,71 @@ async def conversation_agent(request: ChatRequest):
         print(f"🖼️ Image URLs: {image_urls[:2]}...")  # Show first 2
         print(f"📝 Descriptions: {descriptions[:2]}...")  # Show first 2
         
-        chat_message = f"""
-        Create a frontend app for this case: {case_description}
+        # Debug: Show full items data
+        print(f"🔍 Full items data:")
+        for i, item in enumerate(items[:2]):  # Show first 2 items
+            print(f"  Item {i+1}: {item}")
         
-        Use these images: {', '.join(image_urls)}
+        # Detect if we have furniture or events data
+        has_furniture = any('img_url' in item for item in items)
+        has_events = any('image_url' in item for item in items)
         
-        Item descriptions: {', '.join(descriptions)}
+        print(f"🔍 Data type detection: has_furniture={has_furniture}, has_events={has_events}")
+        print(f"🔍 All image URLs being sent: {image_urls}")
         
-        MAKE SURE EVERY VARIABLE AND FUNCTION IS DEFINED. Create a complete, working frontend application.
-        """
+        if has_events:
+            # Events-specific prompt
+            chat_message = f"""
+Create a simple event listing app for this case: {case_description}
+
+EVENT DATA:
+- Images you must include: {', '.join(image_urls)}
+- Descriptions: {', '.join(descriptions)}
+- Locations: {', '.join([item.get('location', 'TBD') for item in items])}
+
+REQUIREMENTS:
+- Show each event as a card with image, description, and location
+- Add ONE "Register" button per event
+- Use simple, clean design
+- Make it mobile-friendly
+- NO filtering, NO sorting, NO complex features
+
+MAKE SURE TO USE THE EXACT IMAGE URLS AND DESCRIPTIONS PROVIDED. Keep it simple - just display events with Register buttons.
+            """
+        else:
+            # Furniture-specific prompt
+            chat_message = f"""
+Create a simple furniture catalog app for this case: {case_description}
+
+PRODUCT DATA:
+- Images you must include: {', '.join(image_urls)}
+- Descriptions: {', '.join(descriptions)}
+
+REQUIREMENTS:
+- Show each product as a card with image and description
+- Add ONE "Add to Cart" button per product
+- Use simple, clean design
+- Make it mobile-friendly
+- NO filtering, NO comparison, NO complex features
+
+MAKE SURE TO USE THE EXACT IMAGE URLS AND DESCRIPTIONS PROVIDED. Keep it simple - just display products with Add to Cart buttons.
+            """
         
         print(f"📤 Sending message to UI generator (length: {len(chat_message)} chars)")
-        result = await run_claude_ui_agent(chat_message)
+        print(f"🔍 Chat message preview (first 500 chars):")
+        print(f"  {chat_message[:500]}...")
+        
+        # Prepare validation data
+        validation_data = {
+            'image_urls': image_urls,
+            'descriptions': descriptions,
+            'locations': [item.get('location', '') for item in items] if has_events else []
+        }
+        print(f"🔍 Validation data: {validation_data}")
+        
+        result = await run_claude_ui_agent(chat_message, validation_data)
         print(f"📥 UI generator returned result (length: {len(str(result))} chars)")
+        print(f"🔍 UI generator result: {result}")  # Show full result
     else:
         print("❌ No items found, skipping UI generation")
         result = {"error": "No items found"}
