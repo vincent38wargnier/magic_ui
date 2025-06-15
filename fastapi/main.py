@@ -12,6 +12,7 @@ load_dotenv()
 from db.mongodb import connect_to_mongo
 from app.agents.ui_generator_agent.graph import run_ui_generator_agent
 from app.agents.default_agent_framework.graph import run_default_agent
+from app.agents.anthropic_no_lanngshit.agent import run_claude_ui_agent
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -72,6 +73,15 @@ async def test():
                     "agent": "ui_generator",
                     "conversation_id": "your-conversation-id-here"
                 }
+            },
+            {
+                "description": "Claude UI Agent - Generate UI and post to endpoint",
+                "method": "POST",
+                "url": "/chat",
+                "body": {
+                    "message": "Create a voting app for IKEA furniture",
+                    "agent": "anthropic_no_lanngshit"
+                }
             }
         ]
     }
@@ -99,10 +109,15 @@ async def chat_with_agent(request: ChatRequest):
                 conversation_id=request.conversation_id
             )
             return {"success": True, "result": result}
+        elif request.agent == "anthropic_no_lanngshit":
+            result = await run_claude_ui_agent(request.message)
+            return result
         else:
             raise HTTPException(status_code=400, detail=f"Unknown agent: {request.agent}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

@@ -43,7 +43,7 @@ async def store_ui_component(content: str) -> str:
                     print(f"🆔 Component ID: {component_id}")
                     print(f"🔗 Display URL: {display_url}")
                     
-                    return f"UI component stored successfully! 🎉\n\n🔗 **View your component here**: {display_url}\n\n📝 Component ID: {component_id}"
+                    return display_url
                     
                 else:
                     error_data = await response.json()

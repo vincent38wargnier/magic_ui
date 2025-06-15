@@ -184,27 +184,6 @@ export default function UIDisplay({ params }) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => window.location.href = '/'}
-                className="text-slate-600 hover:text-indigo-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </button>
-              <div className="text-lg font-bold gradient-text">mcpmyapi.com</div>
-            </div>
-            <div className="text-sm text-slate-500">
-              UI Component Preview
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Component Display Area */}
       <div className="p-4">
