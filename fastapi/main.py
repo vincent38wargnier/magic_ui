@@ -1,10 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import uvicorn
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 import requests
+
+# Import settings and telegram helper
+from settings.config import settings
+from utils.telegram_helper import send_telegram_message
 
 # Load environment variables from .env file
 load_dotenv()
@@ -237,6 +241,8 @@ class ChatRequest(BaseModel):
     conversation_id: Optional[str] = None
     user_id: str = "test_user"
     user_timezone: str = "UTC"
+    chatId: Optional[Union[str, int]] = None  # Telegram chat ID (can be string or int)
+    userId: Optional[Union[str, int]] = None  # Telegram user ID (can be string or int)
 
 
 @app.get("/")
@@ -350,9 +356,51 @@ MAKE SURE TO USE THE EXACT IMAGE URLS AND DESCRIPTIONS PROVIDED. Keep it simple 
         result = await run_claude_ui_agent(chat_message, validation_data)
         print(f"📥 UI generator returned result (length: {len(str(result))} chars)")
         print(f"🔍 UI generator result: {result}")  # Show full result
+        
+        # Send Telegram notification on success
+        if request.chatId and settings.TELEGRAM_BOT_TOKEN:
+            try:
+                # Extract URL from result and replace localhost with Vercel URL
+                ui_url = result.get("url", "")
+                if ui_url:
+                    ui_url = ui_url.replace("http://localhost:3000", "https://magic-ui-lac.vercel.app")
+                
+                success_message = f"Hey! 👋 I just generated a UI for you so it will be easier for you to decide! 😊\n\nI found {len(items)} items for: {case_description}"
+                
+                # Create inline keyboard with button if URL exists
+                reply_markup = None
+                if ui_url:
+                    reply_markup = {
+                        "inline_keyboard": [
+                            [{"text": "🚀 View Your App", "url": ui_url}]
+                        ]
+                    }
+                
+                await send_telegram_message(
+                    bot_token=settings.TELEGRAM_BOT_TOKEN,
+                    chat_id=str(request.chatId),
+                    text=success_message,
+                    reply_markup=reply_markup
+                )
+                print(f"✅ Success notification sent to Telegram chat: {request.chatId}")
+            except Exception as e:
+                print(f"❌ Failed to send Telegram notification: {str(e)}")
     else:
         print("❌ No items found, skipping UI generation")
         result = {"error": "No items found"}
+        
+        # Send Telegram notification on failure
+        if request.chatId and settings.TELEGRAM_BOT_TOKEN:
+            try:
+                error_message = f"Hey! 😅 I tried my best but couldn't find any items for: '{request.message}'\n\nMaybe try a different search or be more specific? I'm here to help! 💪"
+                await send_telegram_message(
+                    bot_token=settings.TELEGRAM_BOT_TOKEN,
+                    chat_id=str(request.chatId),
+                    text=error_message
+                )
+                print(f"✅ Error notification sent to Telegram chat: {request.chatId}")
+            except Exception as e:
+                print(f"❌ Failed to send Telegram error notification: {str(e)}")
     
     return {
         "ai_response": result

@@ -6,7 +6,8 @@ async def send_telegram_message(
     bot_token: str,
     chat_id: str,
     text: str,
-    options: Optional[Dict[str, Any]] = None
+    options: Optional[Dict[str, Any]] = None,
+    reply_markup: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Send a text message to a Telegram chat.
@@ -16,6 +17,7 @@ async def send_telegram_message(
         chat_id: The chat ID to send the message to
         text: The message text to send
         options: Additional options for the message (optional)
+        reply_markup: Inline keyboard markup for buttons (optional)
     
     Returns:
         The response from the Telegram API
@@ -45,6 +47,10 @@ async def send_telegram_message(
             'text': text,
             **(options or {})
         }
+        
+        # Add reply_markup if provided (for inline keyboards/buttons)
+        if reply_markup:
+            payload['reply_markup'] = reply_markup
         
         magic_print(f"Message length: {len(text)} characters", "yellow")
         
