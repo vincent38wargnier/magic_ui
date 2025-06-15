@@ -78,13 +78,29 @@ setTimeout(() => {{
 }}, 1000);
 ```
 
-STYLING REQUIREMENTS:
-- Use modern CSS with flexbox/grid
-- Add hover effects and smooth transitions
-- Use professional color schemes
-- Include cards, shadows, and rounded corners
-- Make it responsive and mobile-friendly
-- Add loading states and feedback
+STYLING REQUIREMENTS (MOBILE-FIRST FOR SMALL SMARTPHONES):
+- CRITICAL: Optimize for very small smartphone screens (320px-375px width)
+- Use minimal margins and paddings (4px-8px max) to maximize screen space
+- Make buttons finger-friendly (min 44px height/width)
+- Use modern CSS with flexbox/grid for compact layouts
+- Add touch-friendly hover effects and smooth transitions
+- Use professional color schemes with high contrast for small screens
+- Include compact cards with minimal shadows and tight spacing
+- MANDATORY: Make it fully responsive and mobile-first
+- Use small font sizes but ensure readability (14px-16px)
+- Minimize white space - pack content efficiently
+- Use full-width layouts where possible
+- Add loading states and feedback optimized for touch
+
+MOBILE CSS REQUIREMENTS:
+```css
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{ margin: 4px; padding: 4px; font-size: 14px; }}
+.container {{ max-width: 100%; padding: 4px 8px; }}
+button {{ min-height: 44px; padding: 8px 12px; border-radius: 4px; }}
+.card {{ margin: 4px 0; padding: 8px; border-radius: 8px; }}
+@media (max-width: 375px) {{ /* Extra optimizations for tiny screens */ }}
+```
 
 Return ONLY the complete HTML code with embedded CSS and JavaScript, no explanations or markdown formatting.
 """
