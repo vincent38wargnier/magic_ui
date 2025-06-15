@@ -35,6 +35,25 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+/* Universal text color override - ensure all text is visible */
+*:not(button):not([class*="gradient-text"]):not([class*="text-white"]):not([class*="text-slate-"]):not([class*="text-gray-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]):not([class*="text-amber-"]) {
+  color: #1e293b !important;
+}
+
+/* Specific text elements */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, li, td, th,
+.header, .option-text, .vote-count, .percentage, 
+.total-votes, .winning, .stats-card {
+  color: #1e293b !important;
+}
+
+/* Header elements specifically */
+.header h1, .header p {
+  color: #1e293b !important;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.8) !important;
+}
+
 /* Premium gradient backgrounds */
 .gradient-bg {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #6366f1 50%, #8b5cf6 75%, #a855f7 100%);
@@ -143,8 +162,24 @@ textarea:focus {
   background-color: rgba(255, 255, 255, 1) !important; /* Full white background on focus */
 }
 
-/* Dark mode input overrides */
+/* Dark mode overrides - keep text dark even in dark mode */
 @media (prefers-color-scheme: dark) {
+  *:not(button):not([class*="gradient-text"]):not([class*="text-white"]):not([class*="text-slate-"]):not([class*="text-gray-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]):not([class*="text-amber-"]) {
+    color: #1e293b !important;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  p, span, div, a, li, td, th,
+  .header, .option-text, .vote-count, .percentage, 
+  .total-votes, .winning, .stats-card {
+    color: #1e293b !important;
+  }
+
+  .header h1, .header p {
+    color: #1e293b !important;
+    text-shadow: 0 1px 3px rgba(255,255,255,0.8) !important;
+  }
+  
   input[type="text"],
   input[type="email"],
   input[type="password"],
