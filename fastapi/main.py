@@ -298,41 +298,83 @@ async def conversation_agent(request: ChatRequest):
         print(f"🔍 All image URLs being sent: {image_urls}")
         
         if has_events:
-            # Events-specific prompt
+            # STEP 1: Create structure-only prompt (NO specific data)
             chat_message = f"""
-Create a simple event listing app for this case: {case_description}
+Create a clean, Apple-style event listing app for this case: {case_description}
 
-EVENT DATA:
-- Images you must include: {', '.join(image_urls)}
-- Descriptions: {', '.join(descriptions)}
-- Locations: {', '.join([item.get('location', 'TBD') for item in items])}
+🎯 FOCUS: Create the LAYOUT and FUNCTIONALITY only. Use placeholder content.
 
-REQUIREMENTS:
-- Show each event as a card with image, description, and location
-- Add ONE "Register" button per event
-- Use simple, clean design
-- Make it mobile-friendly
-- NO filtering, NO sorting, NO complex features
+DESIGN REQUIREMENTS (Apple-style):
+- Clean white background with subtle shadows
+- Elegant cards with border-radius: 12px
+- System fonts (San Francisco style)
+- Minimal color palette (whites, grays, one accent color)
+- Plenty of white space between elements
+- Simple "Register" buttons with subtle hover effects
 
-MAKE SURE TO USE THE EXACT IMAGE URLS AND DESCRIPTIONS PROVIDED. Keep it simple - just display events with Register buttons.
+STRUCTURE REQUIREMENTS:
+- Create {len(items)} event cards with placeholder content
+- Each card should have: placeholder image, "Sample Event Title", "Sample Location"
+- Add working "Register" button with onclick="registerEvent(eventId)" for each card
+- Use placeholder event IDs: 1, 2, 3, etc.
+
+MANDATORY JAVASCRIPT:
+<script>
+function registerEvent(eventId) {{
+    alert('Registered for event ' + eventId + '!');
+    // Simple registration logic
+}}
+</script>
+
+🏗️ PLACEHOLDER EXAMPLE:
+<div class="event-card">
+    <img src="https://via.placeholder.com/400x300" alt="Event Image">
+    <h3>Sample Event Title</h3>
+    <p>Sample event description...</p>
+    <p>Location: Sample Location</p>
+    <button onclick="registerEvent(1)">Register</button>
+</div>
+
+🚨 CRITICAL: Focus on STRUCTURE and FUNCTIONALITY. Real data will be added later.
             """
         else:
-            # Furniture-specific prompt
+            # STEP 1: Create structure-only prompt for furniture (NO specific data)
             chat_message = f"""
-Create a simple furniture catalog app for this case: {case_description}
+Create a clean, Apple-style furniture catalog app for this case: {case_description}
 
-PRODUCT DATA:
-- Images you must include: {', '.join(image_urls)}
-- Descriptions: {', '.join(descriptions)}
+🎯 FOCUS: Create the LAYOUT and FUNCTIONALITY only. Use placeholder content.
 
-REQUIREMENTS:
-- Show each product as a card with image and description
-- Add ONE "Add to Cart" button per product
-- Use simple, clean design
-- Make it mobile-friendly
-- NO filtering, NO comparison, NO complex features
+DESIGN REQUIREMENTS (Apple-style):
+- Clean white background with subtle shadows
+- Elegant cards with border-radius: 12px
+- System fonts (San Francisco style)
+- Minimal color palette (whites, grays, one accent color)
+- Plenty of white space between elements
+- Simple "Add to Cart" buttons with subtle hover effects
 
-MAKE SURE TO USE THE EXACT IMAGE URLS AND DESCRIPTIONS PROVIDED. Keep it simple - just display products with Add to Cart buttons.
+STRUCTURE REQUIREMENTS:
+- Create {len(items)} product cards with placeholder content
+- Each card should have: placeholder image, "Sample Product Name", "Sample Description"
+- Add working "Add to Cart" button with onclick="addToCart(productId)" for each card
+- Use placeholder product IDs: 1, 2, 3, etc.
+
+MANDATORY JAVASCRIPT:
+<script>
+function addToCart(productId) {{
+    alert('Added product ' + productId + ' to cart!');
+    // Simple cart logic
+}}
+</script>
+
+🏗️ PLACEHOLDER EXAMPLE:
+<div class="product-card">
+    <img src="https://via.placeholder.com/400x300" alt="Product Image">
+    <h3>Sample Product Name</h3>
+    <p>Sample product description...</p>
+    <button onclick="addToCart(1)">Add to Cart</button>
+</div>
+
+🚨 CRITICAL: Focus on STRUCTURE and FUNCTIONALITY. Real data will be added later.
             """
         
         print(f"📤 Sending message to UI generator (length: {len(chat_message)} chars)")
