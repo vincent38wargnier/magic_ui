@@ -92,6 +92,17 @@ STYLING REQUIREMENTS (MOBILE-FIRST FOR SMALL SMARTPHONES):
 - Use full-width layouts where possible
 - Add loading states and feedback optimized for touch
 
+IMAGE DESIGN REQUIREMENTS:
+- ALWAYS use object-fit: cover for images to maintain aspect ratio
+- Add rounded corners to all images (border-radius: 8px-12px)
+- Use proper image containers with overflow: hidden
+- Include hover effects and smooth transitions on images
+- Make images responsive with max-width: 100%
+- Add subtle shadows or borders to enhance image presentation
+- Use placeholder backgrounds while images load
+- Optimize image sizes for mobile screens
+- Include alt text for accessibility
+
 MOBILE CSS REQUIREMENTS:
 ```css
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -99,6 +110,18 @@ body {{ margin: 4px; padding: 4px; font-size: 14px; }}
 .container {{ max-width: 100%; padding: 4px 8px; }}
 button {{ min-height: 44px; padding: 8px 12px; border-radius: 4px; }}
 .card {{ margin: 4px 0; padding: 8px; border-radius: 8px; }}
+img {{ 
+    width: 100%; 
+    height: auto; 
+    object-fit: cover; 
+    border-radius: 8px; 
+    transition: transform 0.3s ease;
+}}
+.image-container {{ 
+    overflow: hidden; 
+    border-radius: 12px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}}
 @media (max-width: 375px) {{ /* Extra optimizations for tiny screens */ }}
 ```
 
