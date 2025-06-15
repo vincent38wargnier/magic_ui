@@ -15,6 +15,204 @@ from app.agents.ui_generator_agent.graph import run_ui_generator_agent
 from app.agents.default_agent_framework.graph import run_default_agent
 from app.agents.anthropic_no_lanngshit.agent import run_claude_ui_agent
 
+
+class Furniture(BaseModel):
+    id: int
+    description: str
+    img_url: str
+    type: str
+    color: str
+
+# Sample data
+users_data = [
+    {
+        "id": 1,
+        "name": "Jan Kowalski",
+        "email": "jan@example.com",
+        "active": True
+    },
+    {
+        "id": 2,
+        "name": "Anna Nowak",
+        "email": "anna@example.com",
+        "active": True
+    },
+    {
+        "id": 3,
+        "name": "Piotr Wiśniewski",
+        "email": "piotr@example.com",
+        "active": False
+    }
+]
+
+items_data = [
+    {
+        "id": 1,
+        "name": "Laptop",
+        "price": 2999.99,
+        "description": "Gaming laptop"
+    },
+    {
+        "id": 2,
+        "name": "Mouse",
+        "price": 89.99,
+        "description": "Wireless mouse"
+    },
+    {
+        "id": 3,
+        "name": "Keyboard",
+        "price": 199.99,
+        "description": "Mechanical keyboard"
+    }
+]
+
+furniture_data = [
+    # Blue furniture
+    {
+        "id": 1,
+        "description": "HYLTARP Sofa, Kilanda pale blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/hyltarp-sofa-kilanda-pale-blue__1193800_pe901645_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "blue"
+    },
+    {
+        "id": 2,
+        "description": "UPPLAND Sofa, Kilanda dark blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/uppland-sofa-kilanda-dark-blue__1194843_pe902111_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "blue"
+    },
+    {
+        "id": 3,
+        "description": "KLIPPAN Loveseat, Långban bright blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/klippan-loveseat-langban-bright-blue__1315052_pe940371_s5.jpg?f=xxs",
+        "type": "loveseat",
+        "color": "blue"
+    },
+    {
+        "id": 4,
+        "description": "MORABO Sofa, Djuparp dark blue/wood",
+        "img_url": "https://www.ikea.com/us/en/images/products/morabo-sofa-djuparp-dark-blue-wood__0990602_pe819086_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "blue"
+    },
+    {
+        "id": 5,
+        "description": "SKÖNABÄCK Sleeper sofa, Knisa bright blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/skoenabaeck-sleeper-sofa-knisa-bright-blue__1360567_pe954475_s5.jpg?f=xxs",
+        "type": "sleeper-sofa",
+        "color": "blue"
+    },
+    # Blue chairs
+    {
+        "id": 11,
+        "description": "TEODORES Chair, blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/teodores-chair-blue__1114279_pe871735_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "blue"
+    },
+    {
+        "id": 12,
+        "description": "DYVLINGE Swivel chair, Kelinge orange",
+        "img_url": "https://www.ikea.com/us/en/images/products/dyvlinge-swivel-chair-kelinge-orange__1322501_pe942192_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "blue"
+    },
+    {
+        "id": 13,
+        "description": "KRYLBO Chair, Tonerud blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/krylbo-chair-tonerud-blue__1208500_pe908601_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "blue"
+    },
+    {
+        "id": 14,
+        "description": "TOBIAS Chair, blue/chrome plated",
+        "img_url": "https://www.ikea.com/us/en/images/products/tobias-chair-blue-chrome-plated__0727333_pe735605_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "blue"
+    },
+    {
+        "id": 15,
+        "description": "GENESÖN Chair, metal/blue",
+        "img_url": "https://www.ikea.com/us/en/images/products/genesoen-chair-metal-blue__1185917_pe898620_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "blue"
+    },
+    # Yellow/Green furniture
+    {
+        "id": 6,
+        "description": "JÄTTEBO Sectional, 3-seat, Samsala dark yellow-green",
+        "img_url": "https://www.ikea.com/us/en/images/products/jaettebo-sectional-3-seat-samsala-dark-yellow-green__1109636_pe870121_s5.jpg?f=xxs",
+        "type": "sectional",
+        "color": "green"
+    },
+    {
+        "id": 7,
+        "description": "UPPLAND Sofa, Hakebo gray/green",
+        "img_url": "https://www.ikea.com/us/en/images/products/uppland-sofa-hakebo-gray-green__1194851_pe902101_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "green"
+    },
+    {
+        "id": 8,
+        "description": "JÄTTEBO 4-seat mod sofa w chaise, right/Samsala dark yellow-green",
+        "img_url": "https://www.ikea.com/us/en/images/products/jaettebo-4-seat-mod-sofa-w-chaise-right-samsala-dark-yellow-green__1109638_pe870128_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "green"
+    },
+    {
+        "id": 9,
+        "description": "JÄTTEBO 2.5-seat mod sofa w chaise, left/Samsala dark yellow-green",
+        "img_url": "https://www.ikea.com/us/en/images/products/jaettebo-2-5-seat-mod-sofa-w-chaise-left-samsala-dark-yellow-green__1109585_pe870075_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "green"
+    },
+    {
+        "id": 10,
+        "description": "HYLTARP Sofa, Tallmyra dark green",
+        "img_url": "https://www.ikea.com/us/en/images/products/hyltarp-sofa-tallmyra-dark-green__1193802_pe901629_s5.jpg?f=xxs",
+        "type": "sofa",
+        "color": "green"
+    },
+    # Yellow chairs
+    {
+        "id": 16,
+        "description": "STRANDMON Wing chair, Skiftebo yellow",
+        "img_url": "https://www.ikea.com/us/en/images/products/strandmon-wing-chair-skiftebo-yellow__0325450_pe517970_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "yellow"
+    },
+    {
+        "id": 17,
+        "description": "EKERÖ Armchair, Skiftebo yellow",
+        "img_url": "https://www.ikea.com/us/en/images/products/ekeroe-armchair-skiftebo-yellow__0204753_pe359787_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "yellow"
+    },
+    {
+        "id": 18,
+        "description": "SOTENÄS Armchair, Hakebo red",
+        "img_url": "https://www.ikea.com/us/en/images/products/sotenaes-armchair-hakebo-red__1322509_pe942197_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "yellow"
+    },
+    {
+        "id": 19,
+        "description": "STRANDMON Armchair and ottoman, Skiftebo yellow",
+        "img_url": "https://www.ikea.com/us/en/images/products/strandmon-armchair-and-ottoman-skiftebo-yellow__1094844_pe863644_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "yellow"
+    },
+    {
+        "id": 20,
+        "description": "POÄNG Armchair, birch veneer/Skiftebo yellow",
+        "img_url": "https://www.ikea.com/us/en/images/products/poaeng-armchair-birch-veneer-skiftebo-yellow__0936990_pe793502_s5.jpg?f=xxs",
+        "type": "chair",
+        "color": "yellow"
+    }
+]
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
