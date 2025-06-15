@@ -290,13 +290,28 @@ async def conversation_agent(request: ChatRequest):
                 print(f"No furniture found for {search_param}: {e.detail}")
             except Exception as e:
                 print(f"Error processing {search_param}: {e}")
-                
     
+    # Now call the chat agent to generate a frontend app for the found furniture
+    if all_furniture:
+        image_urls = [item['img_url'] for item in all_furniture]
+        print(f"Image URLs: {image_urls}")
+        product_descriptions = [item['description'] for item in all_furniture]
+        
+        chat_message = f"""
+        Create a frontend app for this case: {case_description}
+        
+        Use these product images: {', '.join(image_urls[:2])}
+        
+        Product descriptions: {', '.join(product_descriptions[:2])}
+        
+        MAKE SURE EVERY VARIABLE AND FUNCTION IS DEFINED. Create a complete, working frontend application that helps the user compare and choose from these furniture options.
+        """
+        
+        # Call the default_agent to generate a smart response
+        result = await run_claude_ui_agent(chat_message)
     
     return {
-        "case_description": case_description,
-        "products": all_furniture,
-        "conversation_id": result["conversation_id"]
+        "ai_response": result
     }
 
 
