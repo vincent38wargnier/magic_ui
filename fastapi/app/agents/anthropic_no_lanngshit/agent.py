@@ -17,20 +17,76 @@ class ClaudeUIAgent:
     def _create_ui_prompt(self, user_message: str) -> str:
         """Create a prompt for UI generation based on user message"""
         return f"""
-You are a UI generator. Based on the user's request, create a complete HTML page with inline CSS and JavaScript.
+You are a UI generator that creates interactive web applications. Based on the user's request, create a complete HTML page with inline CSS and JavaScript that includes interactive elements like buttons, forms, and real-time updates.
 
 User Request: {user_message}
 
-Requirements:
+CRITICAL REQUIREMENTS:
 - Create a complete HTML document with DOCTYPE
-- Include all CSS inline in <style> tags
+- Include all CSS inline in <style> tags  
 - Include all JavaScript inline in <script> tags
-- Make it visually appealing and functional
-- Use modern web standards
-- Include interactive elements where appropriate
-- Use professional styling similar to modern web apps
+- MUST include interactive elements (buttons, forms, inputs, etc.)
+- Use modern, professional styling (cards, gradients, animations, hover effects)
+- Include real-time updates and dynamic content
 
-Return ONLY the HTML code, no explanations or markdown formatting.
+MANDATORY INTERACTIVE FEATURES:
+- Add clickable buttons with onclick handlers
+- Include forms or input fields where relevant
+- Add hover effects and transitions
+- Create dynamic content that updates based on user actions
+- Include counters, voting, or other interactive elements
+
+STATE MANAGEMENT (CRITICAL):
+- Use getState(key, defaultValue) to retrieve stored data
+- Use saveState(object) to save data to backend
+- Always initialize state with default values
+- Update UI immediately after state changes
+- Handle state synchronization with: window.onStateSync = function(newState) {{ updateAllDisplays(); }}
+
+JAVASCRIPT STRUCTURE EXAMPLE:
+```javascript
+// Initialize state
+function initializeState() {{
+    if (getState('example_key') === null) {{
+        saveState({{ 'example_key': 0 }});
+    }}
+}}
+
+// Interactive functions
+function handleClick(action) {{
+    const currentValue = getState('example_key', 0);
+    const newValue = currentValue + 1;
+    saveState({{ 'example_key': newValue }});
+    updateDisplay();
+}}
+
+// Update displays
+function updateDisplay() {{
+    const value = getState('example_key', 0);
+    document.getElementById('display').textContent = value;
+}}
+
+// Handle sync from other users
+window.onStateSync = function(newState) {{
+    updateDisplay();
+}};
+
+// Initialize on load
+setTimeout(() => {{
+    initializeState();
+    updateDisplay();
+}}, 1000);
+```
+
+STYLING REQUIREMENTS:
+- Use modern CSS with flexbox/grid
+- Add hover effects and smooth transitions
+- Use professional color schemes
+- Include cards, shadows, and rounded corners
+- Make it responsive and mobile-friendly
+- Add loading states and feedback
+
+Return ONLY the complete HTML code with embedded CSS and JavaScript, no explanations or markdown formatting.
 """
 
     async def generate_ui_code(self, user_message: str) -> str:

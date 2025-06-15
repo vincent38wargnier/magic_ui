@@ -105,3 +105,67 @@ body {
 .shadow-gold {
   box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.25);
 }
+
+/* Input styling fixes - ensure text is always visible */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+select,
+textarea {
+  color: #1e293b !important; /* Dark slate color for input text */
+  background-color: rgba(255, 255, 255, 0.95) !important; /* Slightly transparent white background */
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="url"]::placeholder,
+textarea::placeholder {
+  color: #64748b !important; /* Slate 500 for placeholder text */
+  opacity: 0.7;
+}
+
+/* Focus states for inputs */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+select:focus,
+textarea:focus {
+  color: #0f172a !important; /* Even darker text on focus */
+  background-color: rgba(255, 255, 255, 1) !important; /* Full white background on focus */
+}
+
+/* Dark mode input overrides */
+@media (prefers-color-scheme: dark) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    color: #1e293b !important; /* Keep dark text even in dark mode */
+    background-color: rgba(255, 255, 255, 0.95) !important; /* Keep light background */
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  select:focus,
+  textarea:focus {
+    color: #0f172a !important;
+    background-color: rgba(255, 255, 255, 1) !important;
+  }
+}
