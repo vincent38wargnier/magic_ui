@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { NextResponse } from 'next/server';
 
-const uri = process.env.MONGODB_URI || 'mongodb+srv://magify-test:9bKHW3DxnZTHvQMs@magify-test.sx207.mongodb.net/workflow';
+const uri = process.env.MONGODB_URI || 'mongodb+srv://magify-test:9bKHW3DxnZTHvQMs@magify-test.sx207.mongodb.net/ui4chat';
 const client = new MongoClient(uri);
 
 export async function POST(request) {

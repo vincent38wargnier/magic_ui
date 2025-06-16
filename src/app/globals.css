@@ -35,23 +35,53 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* Universal text color override - ensure all text is visible */
-*:not(button):not([class*="gradient-text"]):not([class*="text-white"]):not([class*="text-slate-"]):not([class*="text-gray-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]):not([class*="text-amber-"]) {
+/* Smart text visibility - only apply to sections that need it */
+.bg-white *, 
+.bg-gray-50 *,
+.bg-slate-50 *,
+.bg-indigo-50 *,
+.bg-purple-50 *,
+[class*="from-slate-50"] *,
+[class*="from-gray-50"] *,
+[class*="from-white"] * {
   color: #1e293b !important;
 }
 
-/* Specific text elements */
-h1, h2, h3, h4, h5, h6,
-p, span, div, a, li, td, th,
-.header, .option-text, .vote-count, .percentage, 
-.total-votes, .winning, .stats-card {
+/* Ensure input text is always visible */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+select,
+textarea {
   color: #1e293b !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
-/* Header elements specifically */
-.header h1, .header p {
-  color: #1e293b !important;
-  text-shadow: 0 1px 3px rgba(255,255,255,0.8) !important;
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="url"]::placeholder,
+textarea::placeholder {
+  color: #64748b !important;
+  opacity: 0.7;
+}
+
+/* Focus states for inputs */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+select:focus,
+textarea:focus {
+  color: #0f172a !important;
+  background-color: rgba(255, 255, 255, 1) !important;
 }
 
 /* Premium gradient backgrounds */
@@ -123,84 +153,4 @@ p, span, div, a, li, td, th,
 
 .shadow-gold {
   box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.25);
-}
-
-/* Input styling fixes - ensure text is always visible */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="url"],
-select,
-textarea {
-  color: #1e293b !important; /* Dark slate color for input text */
-  background-color: rgba(255, 255, 255, 0.95) !important; /* Slightly transparent white background */
-}
-
-input[type="text"]::placeholder,
-input[type="email"]::placeholder,
-input[type="password"]::placeholder,
-input[type="number"]::placeholder,
-input[type="tel"]::placeholder,
-input[type="url"]::placeholder,
-textarea::placeholder {
-  color: #64748b !important; /* Slate 500 for placeholder text */
-  opacity: 0.7;
-}
-
-/* Focus states for inputs */
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-input[type="tel"]:focus,
-input[type="url"]:focus,
-select:focus,
-textarea:focus {
-  color: #0f172a !important; /* Even darker text on focus */
-  background-color: rgba(255, 255, 255, 1) !important; /* Full white background on focus */
-}
-
-/* Dark mode overrides - keep text dark even in dark mode */
-@media (prefers-color-scheme: dark) {
-  *:not(button):not([class*="gradient-text"]):not([class*="text-white"]):not([class*="text-slate-"]):not([class*="text-gray-"]):not([class*="text-indigo-"]):not([class*="text-purple-"]):not([class*="text-amber-"]) {
-    color: #1e293b !important;
-  }
-
-  h1, h2, h3, h4, h5, h6,
-  p, span, div, a, li, td, th,
-  .header, .option-text, .vote-count, .percentage, 
-  .total-votes, .winning, .stats-card {
-    color: #1e293b !important;
-  }
-
-  .header h1, .header p {
-    color: #1e293b !important;
-    text-shadow: 0 1px 3px rgba(255,255,255,0.8) !important;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="tel"],
-  input[type="url"],
-  select,
-  textarea {
-    color: #1e293b !important; /* Keep dark text even in dark mode */
-    background-color: rgba(255, 255, 255, 0.95) !important; /* Keep light background */
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="number"]:focus,
-  input[type="tel"]:focus,
-  input[type="url"]:focus,
-  select:focus,
-  textarea:focus {
-    color: #0f172a !important;
-    background-color: rgba(255, 255, 255, 1) !important;
-  }
 }
