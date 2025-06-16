@@ -276,6 +276,7 @@ async def conversation_agent(request: ChatRequest):
         user_timezone=request.user_timezone,
         agent_id=request.agent,
         conversation_id=request.conversation_id,
+        telegram_id=str(request.chatId) if request.chatId else None,
     )
     
     items = result["items"]  # Complete objects from agent

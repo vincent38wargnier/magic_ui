@@ -20,11 +20,12 @@ class Conversation(Document):
     messages = ListField(
         DictField()
     )  # List of message dicts with role, content, timestamp
+    telegram_id = StringField()  # Telegram chat/user ID for linking conversations
     is_active = BooleanField(default=True)
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
 
-    meta = {"collection": "conversations", "indexes": ["is_active", "created_at"]}
+    meta = {"collection": "conversations", "indexes": ["is_active", "created_at", "telegram_id"]}
 
     def add_message(self, role, content, task_id=None):
         """Add a message to the conversation"""
@@ -42,7 +43,7 @@ class Conversation(Document):
         return self
 
     @classmethod
-    def get_or_create(cls, conversation_id=None):
+    def get_or_create(cls, conversation_id=None, telegram_id=None):
         """Get an existing conversation or create a new one"""
         if conversation_id:
             try:
@@ -58,5 +59,5 @@ class Conversation(Document):
 
         # Create new conversation if not found or no ID provided
         conversation_id = conversation_id or str(uuid.uuid4())
-        magic_print(f"Creating new conversation: {conversation_id}", "blue")
-        return cls(id=conversation_id, messages=[], is_active=True).save()
+        magic_print(f"Creating new conversation: {conversation_id} for telegram_id: {telegram_id}", "blue")
+        return cls(id=conversation_id, messages=[], telegram_id=str(telegram_id) if telegram_id else None, is_active=True).save()

@@ -25,19 +25,30 @@ async def run_conversation_agent(
     user_timezone: str,
     agent_id: str,
     conversation_id: Optional[str] = None,
+    telegram_id: Optional[str] = None,
 ):
     """Run the conversation agent workflow with a message."""
     print(f"Starting conversation agent for user {user_id}")
 
-    # Create a simple conversation ID if not provided
+    # Create a simple conversation ID if not provided, or get existing one by telegram_id
     if not conversation_id:
-        import uuid
-
-        conversation_id = str(uuid.uuid4())
+        if telegram_id:
+            # Check if there's already a conversation for this telegram user
+            existing_conversation = ConversationCRUD.get_conversation_by_telegram_id(telegram_id)
+            if existing_conversation:
+                conversation_id = existing_conversation.id
+                print(f"🔄 Using existing conversation {conversation_id} for telegram_id: {telegram_id}")
+            else:
+                import uuid
+                conversation_id = str(uuid.uuid4())
+                print(f"🆕 Creating new conversation {conversation_id} for telegram_id: {telegram_id}")
+        else:
+            import uuid
+            conversation_id = str(uuid.uuid4())
 
     # Store user message in conversation using MongoDB
     print(f"💾 Storing user message in conversation: {conversation_id}")
-    ConversationCRUD.add_message(conversation_id, "user", message)
+    ConversationCRUD.add_message(conversation_id, "user", message, telegram_id)
 
     # Get conversation history as dictionaries
     print(f"📖 Loading conversation history for: {conversation_id}")
@@ -84,7 +95,7 @@ async def run_conversation_agent(
         
         # Store agent response in conversation using MongoDB
         print(f"💾 Storing agent response in conversation: {conversation_id}")
-        ConversationCRUD.add_message(conversation_id, "assistant", final_response)
+        ConversationCRUD.add_message(conversation_id, "assistant", final_response, telegram_id)
         print(f"✅ Conversation updated successfully in MongoDB")
         
         return {
